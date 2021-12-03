@@ -2,7 +2,10 @@ package com.DarkBlade12.ModernWeapons.Util;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Entity;
@@ -15,40 +18,43 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.DarkBlade12.ModernWeapons.ModernWeapons;
 
+
 public class WeaponUtil {
 	ModernWeapons plugin;
+
+	Logger log = Logger.getLogger("Minecraft");
 
 	public WeaponUtil(ModernWeapons ModernWeapons) {
 		plugin = ModernWeapons;
 	}
 
 	public ItemStack getItem(String istr) {
-		String[] split = istr.split(",");
-		int id = Integer.parseInt(split[0]);
-		byte data = 0;
-		if (split.length == 2) {
-			data = Byte.parseByte(split[1]);
-		}
-		return new ItemStack(id, 1, data);
+		//int id = Integer.parseInt(split[0]);
+		//return new ItemStack(id, 1, data);	//F451-07222018
+		Material mat = Material.matchMaterial(istr);
+		return new ItemStack(mat, 1);
 	}
 
 	public String getWeaponName(ItemStack i) {
 		if (i == null) {
 			return null;
 		}
-		int id = i.getTypeId();
+
+		//int id = i.getTypeId();	//F451-07212018
+		String id = i.getType().name();
 		byte data = i.getData().getData();
 		// Check for guns
 		Configuration guns = plugin.getGuns();
 		for (String gname : guns.getKeys(false)) {
 			String gstr = guns.getString(gname + ".General.Item");
 			String[] split = gstr.split(",");
-			int gid = Integer.parseInt(split[0]);
+			String gunname = split[0];
 			byte gdata = 0;
 			if (split.length == 2) {
 				gdata = Byte.parseByte(split[1]);
 			}
-			if (id == gid && data == gdata) {
+			//if (id == gunname && data == gdata) {	//F451-08202018
+			if (id.equalsIgnoreCase(gunname)) {
 				return gname;
 			}
 		}
@@ -57,16 +63,19 @@ public class WeaponUtil {
 		for (String grname : grenades.getKeys(false)) {
 			String grstr = grenades.getString(grname + ".General.Item");
 			String[] split = grstr.split(",");
-			int grid = Integer.parseInt(split[0]);
+			//int grid = Integer.parseInt(split[0]);	//F451-07222018
+			String grid = split[0];
 			byte grdata = 0;
 			if (split.length == 2) {
 				grdata = Byte.parseByte(split[1]);
 			}
-			if (id == grid && data == grdata) {
+			//if (id == grid && data == grdata) {	//F451-08202018
+			if (id.equalsIgnoreCase(grid)) {
 				return grname;
 			}
 		}
-		if (id == plugin.knifeIte.getTypeId() && data == plugin.knifeIte.getData().getData()) {
+		//if (id == plugin.knifeIte.getTypeId() && data == plugin.knifeIte.getData().getData()) { //F451-07212018
+		if (id.equalsIgnoreCase(plugin.knifeIte.getType().name())) {
 			return "Knife";
 		}
 		return null;
@@ -111,7 +120,14 @@ public class WeaponUtil {
 
 	public boolean isValidEntity(Entity e) {
 		EntityType et = e.getType();
-		if (et == EntityType.ITEM_FRAME || et == EntityType.BOAT || et == EntityType.ARROW || et == EntityType.ENDER_CRYSTAL || et == EntityType.COMPLEX_PART || et == EntityType.EGG || et == EntityType.DROPPED_ITEM || et == EntityType.ENDER_PEARL || et == EntityType.ENDER_SIGNAL || et == EntityType.EXPERIENCE_ORB || et == EntityType.FALLING_BLOCK || et == EntityType.FIREBALL || et == EntityType.LIGHTNING || et == EntityType.MINECART || et == EntityType.PAINTING || et == EntityType.PRIMED_TNT || et == EntityType.SMALL_FIREBALL || et == EntityType.SNOWBALL || et == EntityType.SPLASH_POTION || et == EntityType.THROWN_EXP_BOTTLE || et == EntityType.UNKNOWN || et == EntityType.WEATHER || et == EntityType.WITHER_SKULL) {
+		// F451-04032020 - removed COMPLEX_PART and WEATHER
+		if (et == EntityType.ITEM_FRAME || et == EntityType.BOAT || et == EntityType.ARROW || 
+				et == EntityType.ENDER_CRYSTAL || et == EntityType.EGG || et == EntityType.DROPPED_ITEM || 
+				et == EntityType.ENDER_PEARL || et == EntityType.ENDER_SIGNAL || et == EntityType.EXPERIENCE_ORB || 
+				et == EntityType.FALLING_BLOCK || et == EntityType.FIREBALL || et == EntityType.LIGHTNING || 
+				et == EntityType.MINECART || et == EntityType.PAINTING || et == EntityType.PRIMED_TNT || 
+				et == EntityType.SMALL_FIREBALL || et == EntityType.SNOWBALL || et == EntityType.SPLASH_POTION || 
+				et == EntityType.THROWN_EXP_BOTTLE || et == EntityType.UNKNOWN || et == EntityType.WITHER_SKULL) {
 			return false;
 		}
 		return true;
@@ -134,10 +150,10 @@ public class WeaponUtil {
 		String gstr = "";
 		if (guns.getKeys(false).size() != 0) {
 			for (String gun : guns.getKeys(false)) {
-				gstr += "\n   §b\u2022 §7§o" + gun;
+				gstr += "\n   "+ChatColor.AQUA+"\u2022 "+ChatColor.GRAY+ChatColor.ITALIC+gun;
 			}
 		} else {
-			gstr = "\n  §b\u2022 §4§oNone";
+			gstr = "\n  "+ChatColor.AQUA+"\u2022 "+ChatColor.DARK_RED+ChatColor.ITALIC+"None";
 		}
 		return gstr;
 	}
@@ -147,10 +163,10 @@ public class WeaponUtil {
 		String grstr = "";
 		if (grenades.getKeys(false).size() != 0) {
 			for (String grenade : grenades.getKeys(false)) {
-				grstr += "\n   §b\u2022 §7§o" + grenade;
+				grstr += "\n   "+ChatColor.AQUA+"\u2022 "+ChatColor.GRAY+ChatColor.ITALIC+grenade;
 			}
 		} else {
-			grstr = "\n  §b\u2022 §4§oNone";
+			grstr = "\n  "+ChatColor.AQUA+"\u2022 "+ChatColor.DARK_RED+ChatColor.ITALIC+"None";
 		}
 		return grstr;
 	}
@@ -179,16 +195,16 @@ public class WeaponUtil {
 		boolean gun = isGun(weapon);
 		if (!gun) {
 			config = plugin.getGrenades();
-			info += "\n §6\u2022 §aType: §7Grenade";
+			info += "\n "+ChatColor.GOLD+"\u2022 "+ChatColor.GREEN+"Type: "+ChatColor.GRAY+"Grenade";	//center circle filled bullet point
 		} else {
 			config = plugin.getGuns();
-			info += "\n §6\u2022 §aType: §7Gun";
+			info += "\n "+ChatColor.GOLD+"\u2022 "+ChatColor.GREEN+"Type: "+ChatColor.GRAY+"Gun";
 		}
 		for (Entry<String, Object> e : config.getConfigurationSection(weapon).getValues(true).entrySet()) {
 			String value = String.valueOf(e.getValue()).replace("[", "").replace("]", "");
 			String property = e.getKey();
 			if (!value.contains("MemorySectionpath")) {
-				info += "\n §6\u2022 §a" + property + ": §7" + value;
+				info += "\n "+ChatColor.GOLD+"\u2022 "+ChatColor.GREEN+ property + ": "+ChatColor.GRAY+value;
 			}
 		}
 		return info;

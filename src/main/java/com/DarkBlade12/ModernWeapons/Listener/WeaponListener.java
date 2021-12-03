@@ -1,9 +1,14 @@
 package com.DarkBlade12.ModernWeapons.Listener;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -31,11 +36,17 @@ import org.bukkit.potion.PotionEffectType;
 import com.DarkBlade12.ModernWeapons.ModernWeapons;
 import com.DarkBlade12.ModernWeapons.Weapons.Grenade;
 import com.DarkBlade12.ModernWeapons.Weapons.Gun;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.*;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+//import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 public class WeaponListener implements Listener {
 	ModernWeapons plugin;
+	Logger log = Logger.getLogger("Minecraft");
 
 	public WeaponListener(ModernWeapons ModernWeapons) {
 		this.plugin = ModernWeapons;
@@ -44,6 +55,10 @@ public class WeaponListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerInteract(PlayerInteractEvent event) {
+
+		RegionContainer rc = WorldGuard.getInstance().getPlatform().getRegionContainer();
+		RegionQuery rq = rc.createQuery();
+
 		Action action = event.getAction();
 		if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_AIR && action != Action.LEFT_CLICK_BLOCK) {
 			return;
@@ -54,7 +69,8 @@ public class WeaponListener implements Listener {
 				return;
 			}
 		}
-		String weapon = plugin.wu.getWeaponName(p.getItemInHand());
+		//String weapon = plugin.wu.getWeaponName(p.getItemInHand());
+		String weapon = plugin.wu.getWeaponName(p.getInventory().getItemInMainHand());
 		if (weapon == null) {
 			return;
 		}
@@ -64,18 +80,23 @@ public class WeaponListener implements Listener {
 		if (plugin.noPvpDisabled) {
 			if (!p.getWorld().getPVP()) {
 				if (plugin.disabledMessage) {
-					p.sendMessage(plugin.disabled);
+					p.sendMessage(ChatColor.DARK_RED+""+ChatColor.BOLD+plugin.disabled);
 				}
 				return;
 			} else if (plugin.hasWorldGuard) {
-				RegionManager rm = plugin.getWorldGuard().getRegionManager(p.getWorld());
-				if (!rm.getApplicableRegions(p.getLocation()).allows(DefaultFlag.PVP)) {
+				
+				//RegionContainer rc = plugin.getRegionContainer();
+				//if (!rm.getApplicableRegions(p.getLocation()).allows(DefaultFlag.PVP)) {
+				if (!rq.testState(BukkitAdapter.adapt(p.getLocation()), WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
 					if (plugin.disabledMessage) {
-						p.sendMessage(plugin.disabled);
+						p.sendMessage(ChatColor.DARK_RED+""+ChatColor.BOLD+plugin.disabled);
 					}
 					return;
 				}
 			}
+		}
+		if (weapon.equals("Knife")) {
+			return;
 		}
 		boolean aiming = false;
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
@@ -92,7 +113,8 @@ public class WeaponListener implements Listener {
 			return;
 		} else {
 			if (gun) {
-				Gun g = new Gun(weapon, p, plugin, p.getItemInHand());
+				//Gun g = new Gun(weapon, p, plugin, p.getItemInHand());
+				Gun g = new Gun(weapon, p, plugin, p.getInventory().getItemInMainHand());
 				if (p.isSneaking()) {
 					g.startReloading();
 					return;
@@ -110,11 +132,18 @@ public class WeaponListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onProjectileHit(ProjectileHitEvent event) {
+		
+		RegionContainer rc = WorldGuard.getInstance().getPlatform().getRegionContainer();
+		RegionQuery rq = rc.createQuery();		
+		
 		Projectile pr = (Projectile) event.getEntity();
-		Entity shooter = pr.getShooter();
-		if (!(shooter instanceof Player)) {
+		if (!(event.getEntity().getShooter() instanceof Player)) {
 			return;
 		}
+		Entity shooter = (Entity) pr.getShooter();
+//		if (!(shooter instanceof Player)) {
+//			return;
+//		}
 		Player p = (Player) shooter;
 		if (pr.getMetadata("WeaponName").size() == 0) {
 			return;
@@ -126,15 +155,25 @@ public class WeaponListener implements Listener {
 		}
 		if (g.willExplode()) {
 			Location loc = pr.getLocation();
-			loc.getWorld().createExplosion(loc.getX(), loc.getY(), loc.getZ(), 5.0F, false, plugin.blockDamage);
+			if (plugin.hasWorldGuard) {
+				//RegionManager rm = plugin.getWorldGuard().getRegionManager(pr.getWorld());
+				//if (rm.getApplicableRegions(loc).getFlag(DefaultFlag.OTHER_EXPLOSION) != StateFlag.State.DENY) {
+				if (rq.testState(BukkitAdapter.adapt(loc), null, Flags.OTHER_EXPLOSION)) {
+					loc.getWorld().createExplosion(loc.getX(), loc.getY(), loc.getZ(), 5.0F, false, plugin.blockDamage);
+				}
+			} else {
+				loc.getWorld().createExplosion(loc.getX(), loc.getY(), loc.getZ(), 5.0F, false, plugin.blockDamage);
+			}
 			List<Entity> elist = pr.getNearbyEntities((double) g.getExplosionRange(), (double) g.getExplosionRange(), (double) g.getExplosionRange());
 			for (int t = 0; t < elist.size(); t++) {
 				Entity n = elist.get(t);
 				boolean damage = true;
 				if (n instanceof Player) {
 					if (plugin.noPvpDisabled && plugin.hasWorldGuard) {
-						RegionManager rm = plugin.getWorldGuard().getRegionManager(p.getWorld());
-						if (!rm.getApplicableRegions(n.getLocation()).allows(DefaultFlag.PVP)) {
+						//RegionManager rm = plugin.getWorldGuard().getRegionManager(pr.getWorld());
+						//rm = plugin.getWorldGuard().getRegionManager(p.getWorld());
+						//if (!rm.getApplicableRegions(n.getLocation()).allows(DefaultFlag.PVP)) {
+						if (!rq.testState(BukkitAdapter.adapt(p.getLocation()), WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
 							damage = false;
 						}
 					}
@@ -142,7 +181,7 @@ public class WeaponListener implements Listener {
 						damage = false;
 					}
 				}
-				if (plugin.wu.isValidEntity(n) && damage) {
+				if (plugin.wu.isValidEntity(n) && damage && !(n instanceof Projectile)) {
 					((LivingEntity) n).setMetadata("DamagerWeaponName", new FixedMetadataValue(plugin, g.getName()));
 					((LivingEntity) n).damage(g.getExplosionDamage(), p);
 				}
@@ -156,6 +195,10 @@ public class WeaponListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+		
+		RegionContainer rc = WorldGuard.getInstance().getPlatform().getRegionContainer();
+		RegionQuery rq = rc.createQuery();		
+
 		if (!plugin.wu.isValidEntity(event.getEntity())) {
 			return;
 		}
@@ -163,8 +206,10 @@ public class WeaponListener implements Listener {
 		if (event.getCause() != DamageCause.PROJECTILE) {
 			if (plugin.knifeEnabled && event.getCause() == DamageCause.ENTITY_ATTACK && event.getDamager() instanceof Player) {
 				Player d = (Player) event.getDamager();
-				ItemStack h = d.getItemInHand();
-				if (h.getTypeId() == plugin.knifeIte.getTypeId() && h.getData().getData() == plugin.knifeIte.getData().getData()) {
+				//ItemStack h = d.getItemInHand();
+				ItemStack h = d.getInventory().getItemInMainHand();
+				//if (h.getTypeId() == plugin.knifeIte.getTypeId() && h.getData().getData() == plugin.knifeIte.getData().getData()) {	//F451-07212018
+				if (h.getType().name().toUpperCase().equals(plugin.knifeIte.getType().name().toUpperCase())) {
 					int damage = plugin.knifeDamage;
 					if (plugin.wu.isBackstab(d, e)) {
 						damage = plugin.knifeBackstabDamage;
@@ -177,10 +222,13 @@ public class WeaponListener implements Listener {
 			return;
 		}
 		Projectile pr = (Projectile) event.getDamager();
-		Entity shooter = pr.getShooter();
-		if (!(shooter instanceof Player)) {
+		if (!(pr.getShooter() instanceof Player)) {
 			return;
 		}
+		Entity shooter = (Entity) pr.getShooter(); 
+//		if (!(shooter instanceof Player)) {
+//			return;
+//		}
 		Player p = (Player) shooter;
 		if (pr.getMetadata("WeaponName").size() == 0) {
 			return;
@@ -189,8 +237,9 @@ public class WeaponListener implements Listener {
 		Gun g = new Gun(weapon, p, plugin, null);
 		if (e instanceof Player) {
 			if (plugin.noPvpDisabled && plugin.hasWorldGuard) {
-				RegionManager rm = plugin.getWorldGuard().getRegionManager(p.getWorld());
-				if (!rm.getApplicableRegions(e.getLocation()).allows(DefaultFlag.PVP)) {
+				//RegionManager rm = plugin.getWorldGuard().getRegionManager(p.getWorld());
+				//if (!rm.getApplicableRegions(e.getLocation()).allows(DefaultFlag.PVP)) {
+				if (!rq.testState(BukkitAdapter.adapt(p.getLocation()), WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP) ) {
 					e.setMetadata("Headshot", new FixedMetadataValue(plugin, false));
 					return;
 				}
@@ -204,13 +253,14 @@ public class WeaponListener implements Listener {
 			if (e instanceof Player) {
 				if (plugin.headshotMessage) {
 					Player ep = (Player) e;
-					p.sendMessage(plugin.headshotShooter.replace("%player%", ep.getName()));
-					ep.sendMessage(plugin.headshotVictim.replace("%player%", p.getName()));
+					p.sendMessage(ChatColor.GREEN+""+ChatColor.GREEN+plugin.headshotShooter.replace("%player%", ep.getName()));
+					ep.sendMessage(ChatColor.DARK_RED+""+ChatColor.BOLD+plugin.headshotVictim.replace("%player%", p.getName()));
 				}
 				e.setMetadata("Headshot", new FixedMetadataValue(plugin, true));
 			}
 			if (plugin.headshotEffect) {
-				e.getWorld().playEffect(e.getEyeLocation(), Effect.STEP_SOUND, 55);
+				//e.getWorld().playEffect(e.getEyeLocation(), Effect.STEP_SOUND, 55);
+				e.getWorld().spawnParticle(Particle.BLOCK_DUST, e.getEyeLocation(), 55, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
 			}
 			damage += g.getHeadshotBonus();
 		} else {
@@ -275,13 +325,13 @@ public class WeaponListener implements Listener {
 			return;
 		}
 		boolean gun = plugin.wu.isGun(weapon);
-		p.getWorld().playSound(p.getLocation(), Sound.BAT_TAKEOFF, 0.5F, 5);
+		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 0.5F, 5);
 		if (gun) {
 			Gun g = new Gun(weapon, p, plugin, i);
 			g.refreshItem(i);
 			return;
 		} else if (weapon.equalsIgnoreCase("Knife")) {
-			p.getInventory().setItem(slot, plugin.wu.rename(i, "§b§oKnife"));
+			p.getInventory().setItem(slot, plugin.wu.rename(i, ChatColor.AQUA+""+ChatColor.ITALIC+"Knife"));
 		} else {
 			Grenade gr = new Grenade(weapon, p, plugin);
 			gr.refreshItem();
@@ -313,10 +363,10 @@ public class WeaponListener implements Listener {
 			if (p.getMetadata("Headshot").size() > 0) {
 				boolean headshot = (boolean) p.getMetadata("Headshot").get(0).value();
 				if (headshot) {
-					addition = "§4\u271B";
+					addition = ChatColor.DARK_RED+"\u271B";	//open center cross
 				}
 			}
-			event.setDeathMessage(plugin.death.replace("%killer%", k.getName()).replace("%player%", p.getName() + addition).replace("%weapon%", weapon));
+			event.setDeathMessage(ChatColor.DARK_GRAY+""+ChatColor.BOLD+plugin.death.replace("%killer%", k.getName()).replace("%player%", ChatColor.GRAY+""+ChatColor.BOLD+p.getName() + addition).replace("%weapon%", ChatColor.RESET+""+ChatColor.GREEN+weapon));
 			pr.removeMetadata("WeaponName", plugin);
 		} else {
 			if (!(e.getDamager() instanceof Player)) {

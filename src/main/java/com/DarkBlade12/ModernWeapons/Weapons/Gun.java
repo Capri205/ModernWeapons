@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Effect;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -24,9 +25,21 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.DarkBlade12.ModernWeapons.ModernWeapons;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
+
+//import net.minecraft.server.v1_13_R1.Material;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 
 @SuppressWarnings("deprecation")
 public class Gun {
+	
+	Logger log = Logger.getLogger("Minecraft");
+
 	private ItemStack gunIte;
 	private ItemStack ammoIte;
 	private List<String> lore = new ArrayList<String>();
@@ -146,6 +159,7 @@ public class Gun {
 	}
 
 	private void getShotsFromDisplay(ItemStack i) {
+
 		if (i == null) {
 			return;
 		}
@@ -158,17 +172,19 @@ public class Gun {
 			return;
 		}
 		String display = i.getItemMeta().getDisplayName();
-		if (display.split("\uFD3E").length == 1) {
+		String[] parts = display.split(" \u25AA | \u25AB ");
+		if (display.split("\\(").length == 1) {
 			if (plugin.fullmagStart) {
 				this.shotsLeft = this.magSize;
 			} else {
 				this.shotsLeft = 0;
 			}
 		}
-		String[] nums = display.split("\uFD3E");
+		String[] nums = display.split("\\(");
 		String num = "";
 		if (nums.length >= 2) {
-			num = nums[1].replace("§7\uFD3F", "").replace("§a", "").replace("§6", "").replace("§4", "").replace("§f", "").replace("§c\u0280", "");
+			//num = nums[1].replace("Â§7)", "").replace("Â§a", "").replace("Â§6", "").replace("Â§4", "").replace("Â§f", "").replace("Â§c\u0280", "");
+			num = nums[1].replaceAll(ChatColor.GRAY.toString(), "").replaceAll(ChatColor.GREEN.toString(),"").replaceAll(ChatColor.GOLD.toString(), "").replaceAll(ChatColor.DARK_RED.toString(),"").replaceAll(ChatColor.WHITE.toString(),"").replaceAll(ChatColor.RED.toString(), "").replaceAll("[\\D]", "");
 		}
 		try {
 			this.shotsLeft = Integer.parseInt(num);
@@ -189,7 +205,7 @@ public class Gun {
 			this.reloading = false;
 			return;
 		}
-		if (i.getItemMeta().getDisplayName().contains("§c\u0280")) {
+		if (i.getItemMeta().getDisplayName().contains("\u0280")) {	//small caps R
 			this.reloading = true;
 		} else {
 			this.reloading = false;
@@ -204,7 +220,7 @@ public class Gun {
 			this.boltActionPerform = false;
 			return;
 		}
-		if (i.getItemMeta().getDisplayName().contains("\u2043")) {
+		if (i.getItemMeta().getDisplayName().contains("\u2043")) {	// hypen bullet point
 			this.boltActionPerform = true;
 		} else {
 			this.boltActionPerform = false;
@@ -219,7 +235,7 @@ public class Gun {
 			this.unableToShoot = false;
 			return;
 		}
-		if (i.getItemMeta().getDisplayName().contains("§f")) {
+		if (i.getItemMeta().getDisplayName().contains(ChatColor.WHITE.toString())) {
 			this.unableToShoot = true;
 		} else {
 			this.unableToShoot = false;
@@ -287,7 +303,8 @@ public class Gun {
 		this.sound = SoundType.fromName(config.getString(index + ".General.Sound"));
 		this.selfImmunity = config.getBoolean(index + ".General.SelfImmunity");
 		for (String l : config.getStringList(index + ".General.Lore")) {
-			this.lore.add(l.replace("&", "§"));
+			//this.lore.add(l.replace("&", "Â§"));
+			this.lore.add(ChatColor.translateAlternateColorCodes('&', l));
 		}
 		// Shooting related
 		this.velocity = config.getInt(index + ".Shooting.Velocity");
@@ -335,7 +352,7 @@ public class Gun {
 		if (!this.hasScope()) {
 			return;
 		}
-		this.holder.getWorld().playSound(this.holder.getLocation(), Sound.ENDERDRAGON_WINGS, 1, 5);
+		this.holder.getWorld().playSound(this.holder.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1, 5);
 		if (this.aiming) {
 			this.holder.removePotionEffect(PotionEffectType.SPEED);
 			this.holder.setMetadata("Aiming", new FixedMetadataValue(plugin, false));
@@ -351,22 +368,34 @@ public class Gun {
 		if (this.hitEffect == null) {
 			return;
 		}
+		RegionContainer rc = WorldGuard.getInstance().getPlatform().getRegionContainer();
+		RegionQuery rq = rc.createQuery();		
+		if (plugin.hasWorldGuard) {
+			if (!rq.testState(BukkitAdapter.adapt(loc), null, Flags.OTHER_EXPLOSION)) {
+				return;
+			}
+		}
 		World w = loc.getWorld();
 		switch (this.hitEffect) {
 			case BLOCK_BREAK:
-				w.playEffect(loc, Effect.STEP_SOUND, this.hitEffectData);
+				//w.playEffect(loc, Effect.STEP_SOUND, this.hitEffectData);
+				w.spawnParticle(Particle.BLOCK_DUST, loc, this.hitEffectData, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
 				return;
 			case ENDER_SIGNAL:
-				w.playEffect(loc, Effect.ENDER_SIGNAL, this.hitEffectData);
+//				w.playEffect(loc, Effect.ENDER_SIGNAL, this.hitEffectData);
+				w.spawnParticle(Particle.PORTAL, loc, this.hitEffectData, 0, 0, 0, 1);
 				return;
 			case FLAMES:
-				w.playEffect(loc, Effect.MOBSPAWNER_FLAMES, this.hitEffectData);
+//				w.playEffect(loc, Effect.MOBSPAWNER_FLAMES, this.hitEffectData);
+				w.spawnParticle(Particle.FLAME, loc, this.hitEffectData, 0, 0, 0, 1);
 				return;
 			case POTION_BREAK:
-				w.playEffect(loc, Effect.POTION_BREAK, this.hitEffectData);
+//				w.playEffect(loc, Effect.POTION_BREAK, this.hitEffectData);
+				w.spawnParticle(Particle.SPELL, loc, this.hitEffectData, 0, 0, 0, 0.2);
 				return;
 			case SMOKE:
-				w.playEffect(loc, Effect.SMOKE, this.hitEffectData);
+//				w.playEffect(loc, Effect.SMOKE, this.hitEffectData);
+				w.spawnParticle(Particle.SMOKE_NORMAL, loc, this.hitEffectData, 0, 0, 0, 1);
 				return;
 		}
 	}
@@ -379,19 +408,24 @@ public class Gun {
 		World w = loc.getWorld();
 		switch (this.shootEffect) {
 			case BLOCK_BREAK:
-				w.playEffect(loc, Effect.STEP_SOUND, this.shootEffectData);
+				//w.playEffect(loc, Effect.STEP_SOUND, this.shootEffectData);
+				w.spawnParticle(Particle.BLOCK_DUST, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
 				return;
 			case ENDER_SIGNAL:
-				w.playEffect(loc, Effect.ENDER_SIGNAL, this.shootEffectData);
+				//w.playEffect(loc, Effect.ENDER_SIGNAL, this.shootEffectData);
+				w.spawnParticle(Particle.PORTAL, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, 0.2);
 				return;
 			case FLAMES:
-				w.playEffect(loc, Effect.MOBSPAWNER_FLAMES, this.shootEffectData);
+				//w.playEffect(loc, Effect.MOBSPAWNER_FLAMES, this.shootEffectData);
+				w.spawnParticle(Particle.FLAME, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, 2);
 				return;
 			case POTION_BREAK:
-				w.playEffect(loc, Effect.POTION_BREAK, this.shootEffectData);
+				//w.playEffect(loc, Effect.POTION_BREAK, this.shootEffectData);
+				w.spawnParticle(Particle.SPELL, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, 0.2);
 				return;
 			case SMOKE:
-				w.playEffect(loc, Effect.SMOKE, this.shootEffectData);
+				//w.playEffect(loc, Effect.SMOKE, this.shootEffectData);
+				w.spawnParticle(Particle.SMOKE_NORMAL, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, 0.1);
 				return;
 		}
 	}
@@ -404,37 +438,37 @@ public class Gun {
 		World w = loc.getWorld();
 		switch (this.sound) {
 			case SUBMACHINE_GUN:
-				w.playSound(loc, Sound.ZOMBIE_METAL, 1, 5);
-				w.playSound(loc, Sound.ZOMBIE_WOOD, 1, 5);
-				w.playSound(loc, Sound.NOTE_BASS_DRUM, 1, 5);
+				w.playSound(loc, Sound.BLOCK_METAL_HIT, 1, 5);
+				w.playSound(loc, Sound.BLOCK_WOOD_HIT, 1, 5);
+				w.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 1, 5);
 				break;
 			case ROCKET_LAUNCHER:
-				w.playSound(loc, Sound.FIRE_IGNITE, 1, 5);
-				w.playSound(loc, Sound.GHAST_FIREBALL, 1, 5);
-				w.playSound(loc, Sound.NOTE_BASS_DRUM, 1, 5);
-				w.playSound(loc, Sound.IRONGOLEM_HIT, 1, 5);
+				w.playSound(loc, Sound.ITEM_FLINTANDSTEEL_USE, 1, 5);
+				w.playSound(loc, Sound.ENTITY_GHAST_SHOOT , 1, 5);
+				w.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM , 1, 5);
+				w.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 5);
 				break;
 			case SHOTGUN:
-				w.playSound(loc, Sound.EXPLODE, 1, 5);
-				w.playSound(loc, Sound.SKELETON_HURT, 1, 5);
+				w.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 5);
+				w.playSound(loc, Sound.ENTITY_SKELETON_HURT, 1, 5);
 				break;
 			case SNIPER:
-				w.playSound(loc, Sound.NOTE_SNARE_DRUM, 1, 5);
-				w.playSound(loc, Sound.BLAZE_HIT, 1, 5);
+				w.playSound(loc, Sound.BLOCK_NOTE_BLOCK_SNARE, 1, 5);
+				w.playSound(loc, Sound.ENTITY_BLAZE_HURT, 1, 5);
 				break;
 			case PISTOL:
-				w.playSound(loc, Sound.STEP_LADDER, 1, 5);
-				w.playSound(loc, Sound.ITEM_BREAK, 1, 5);
-				w.playSound(loc, Sound.WOOD_CLICK, 1, 5);
-				w.playSound(loc, Sound.IRONGOLEM_HIT, 1, 5);
-				w.playSound(loc, Sound.STEP_STONE, 1, 5);
+				w.playSound(loc, Sound.BLOCK_LADDER_STEP, 1, 5);
+				w.playSound(loc, Sound.ENTITY_ITEM_BREAK, 1, 5);
+				w.playSound(loc, Sound.BLOCK_WOODEN_BUTTON_CLICK_ON, 1, 5);
+				w.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 5);
+				w.playSound(loc, Sound.BLOCK_STONE_STEP, 1, 5);
 				break;
 			case ASSAULT_RIFLE:
-				w.playSound(loc, Sound.NOTE_SNARE_DRUM, 1, 5);
-				w.playSound(loc, Sound.WITHER_SHOOT, 1, 5);
-				w.playSound(loc, Sound.BAT_TAKEOFF, 1, 5);
-				w.playSound(loc, Sound.FIRE_IGNITE, 1, 5);
-				w.playSound(loc, Sound.IRONGOLEM_HIT, 1, 5);
+				w.playSound(loc, Sound.BLOCK_NOTE_BLOCK_SNARE, 1, 5);
+				w.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1, 5);
+				w.playSound(loc, Sound.ENTITY_BAT_TAKEOFF, 1, 5);
+				w.playSound(loc, Sound.ITEM_FLINTANDSTEEL_USE, 1, 5);
+				w.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 5);
 				break;
 		}
 	}
@@ -509,7 +543,8 @@ public class Gun {
 				launchProjectile();
 			}
 		} else {
-			doBurstShot(1, this.holder.getItemInHand());
+			//doBurstShot(1, this.holder.getItemInHand());
+			doBurstShot(1, this.holder.getInventory().getItemInMainHand());
 		}
 		if (this.recoil != 0.0D) {
 			this.holder.setVelocity(this.holder.getLocation().getDirection().multiply(-this.recoil).setY(0.0D));
@@ -519,7 +554,8 @@ public class Gun {
 		} else if (!burst) {
 			if (!hasUnlimited()) {
 				this.shotsLeft--;
-				refreshItem(this.holder.getItemInHand());
+				//refreshItem(this.holder.getItemInHand());
+				refreshItem(this.holder.getInventory().getItemInMainHand());
 			}
 		}
 		if (plugin.autoReload && this.shotsLeft == 0) {
@@ -562,7 +598,8 @@ public class Gun {
 
 	private void prepareBoltAction() {
 		this.unableToShoot = true;
-		final ItemStack fItem = refreshItem(this.holder.getItemInHand());
+		//final ItemStack fItem = refreshItem(this.holder.getItemInHand());
+		final ItemStack fItem = refreshItem(this.holder.getInventory().getItemInMainHand());
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 			@Override
 			public void run() {
@@ -572,13 +609,13 @@ public class Gun {
 	}
 
 	private void performBoltAction(ItemStack i) {
-		this.holder.getWorld().playSound(this.holder.getLocation(), Sound.PISTON_RETRACT, 1, 5);
+		this.holder.getWorld().playSound(this.holder.getLocation(), Sound.BLOCK_PISTON_CONTRACT, 1, 5);
 		this.boltActionPerform = true;
 		final ItemStack fItem = this.refreshItem(i);
 		this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 			@Override
 			public void run() {
-				holder.getWorld().playSound(holder.getLocation(), Sound.PISTON_EXTEND, 1, 5);
+				holder.getWorld().playSound(holder.getLocation(), Sound.BLOCK_PISTON_EXTEND, 1, 5);
 				boltActionPerform = false;
 				unableToShoot = false;
 				if (!hasUnlimited()) {
@@ -618,12 +655,15 @@ public class Gun {
 				break;
 			}
 			if (i != null) {
-				int id = i.getTypeId();
+				//int id = i.getTypeId();	//F451-07220218
+				String id = i.getType().name();
 				byte data = i.getData().getData();
-				if (id == this.ammoIte.getTypeId() && data == this.ammoIte.getData().getData()) {
+				//if (id == this.ammoIte.getTypeId() && data == this.ammoIte.getData().getData()) {	//F451-07222018
+				if (id == this.ammoIte.getType().name() && data == this.ammoIte.getData().getData()) {
 					if (remaining > 0) {
 						if (i.getAmount() == amount) {
-							i.setTypeId(0);
+							//i.setTypeId(0);	//F451-07222018
+							i.setType(Material.AIR);
 							break;
 						}
 						if (i.getAmount() > amount) {
@@ -632,7 +672,8 @@ public class Gun {
 						}
 						if (i.getAmount() < amount) {
 							remaining = remaining - i.getAmount();
-							i.setTypeId(0);
+							//i.setTypeId(0);	//F451-07222018
+							i.setType(Material.AIR);
 						}
 					}
 				}
@@ -661,10 +702,12 @@ public class Gun {
 		ItemStack[] contents = this.holder.getInventory().getContents();
 		for (ItemStack stack : contents) {
 			if (stack != null) {
-				int id = stack.getTypeId();
+				//int id = stack.getTypeId();	//F451-07222018
+				String id = stack.getType().name();
 				byte data = stack.getData().getData();
 				int amount = stack.getAmount();
-				if (id == this.ammoIte.getTypeId() && data == this.ammoIte.getData().getData()) {
+				//if (id == this.ammoIte.getTypeId() && data == this.ammoIte.getData().getData()) {	//F451-07222018
+				if (id == this.ammoIte.getType().name() && data == this.ammoIte.getData().getData()) {
 					cmag = cmag + amount;
 				}
 			}
@@ -680,9 +723,9 @@ public class Gun {
 		int left = getAmmoLeft();
 		if (left < 1) {
 			if (plugin.messagesEnabled) {
-				this.holder.sendMessage(plugin.noMagazine);
+				this.holder.sendMessage(ChatColor.DARK_RED+""+ChatColor.BOLD+plugin.noMagazine);
 			}
-			this.holder.getWorld().playSound(this.holder.getLocation(), Sound.CLICK, 1, 5);
+			this.holder.getWorld().playSound(this.holder.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 1, 5);
 			return;
 		} else if (left + this.shotsLeft == this.magSize) {
 			removeAmmo(left);
@@ -696,11 +739,13 @@ public class Gun {
 			removeAmmo(left);
 			amount = nshots;
 		}
-		this.holder.getWorld().playSound(this.holder.getLocation(), Sound.PISTON_RETRACT, 1, 5);
+		this.holder.getWorld().playSound(this.holder.getLocation(), Sound.BLOCK_PISTON_CONTRACT, 1, 5);
 		this.reloading = true;
-		refreshItem(this.holder.getItemInHand());
+		//refreshItem(this.holder.getItemInHand());
+		refreshItem(this.holder.getInventory().getItemInMainHand());
 		final int fAmount = amount;
-		final ItemStack fItem = this.holder.getItemInHand();
+		//final ItemStack fItem = this.holder.getItemInHand();
+		final ItemStack fItem = this.holder.getInventory().getItemInMainHand();
 		this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 			@Override
 			public void run() {
@@ -711,38 +756,40 @@ public class Gun {
 				}
 				reloading = false;
 				if (plugin.messagesEnabled) {
-					holder.sendMessage(plugin.weaponReloaded.replace("%weapon%", name));
+					holder.sendMessage(ChatColor.GREEN+""+ChatColor.BOLD+plugin.weaponReloaded.replace("%weapon%", name));
 				}
 				refreshItem(fItem);
-				holder.getWorld().playSound(holder.getLocation(), Sound.FIRE_IGNITE, 1, 5);
-				holder.getWorld().playSound(holder.getLocation(), Sound.ANVIL_BREAK, 1, 5);
+				holder.getWorld().playSound(holder.getLocation(), Sound.ITEM_FLINTANDSTEEL_USE, 1, 5);
+				holder.getWorld().playSound(holder.getLocation(), Sound.BLOCK_ANVIL_BREAK , 1, 5);
 			}
 		}, this.reloadTime * 20L);
 	}
 
 	public ItemStack refreshItem(ItemStack i) {
-		String color = "§a";
+		ChatColor color = ChatColor.GREEN;
 		if (this.shotsLeft == 0) {
-			color = "§4";
+			color = ChatColor.DARK_RED;
 		} else if (this.shotsLeft < this.magSize / 2) {
-			color = "§6";
+			color = ChatColor.GOLD;
 		}
 		if (this.unableToShoot) {
-			color = "§f";
+			color = ChatColor.WHITE;
 		}
-		String spacer = " §r§b\u25AA ";
+		String spacer = ChatColor.RESET+""+ChatColor.AQUA+" \u25AA ";	//filled small square
 		if (this.reloading || this.shotsLeft == 0) {
-			spacer = " §r§b\u25AB ";
+			spacer = ChatColor.RESET+""+ChatColor.AQUA+" \u25AB ";	// white small square
 		} else if (this.boltActionPerform) {
-			spacer = " §r§b\u2043 ";
+			spacer = ChatColor.RESET+""+ChatColor.AQUA+" \u2043 ";	// hypen bullet point
 		}
-		String ammo = "§r§7\uFD3E" + color + this.shotsLeft + "§7\uFD3F";
+		String ammo = ChatColor.RESET+""+ChatColor.GRAY+"(" + color + this.shotsLeft + ChatColor.GRAY+")";
 		if (this.reloading) {
-			ammo += "§c\u0280";
+			ammo += ChatColor.RED+"\u0280";
 		}
-		String display = "§8§l" + this.name + spacer + ammo;
-		if (i.isSimilar(Bukkit.getPlayer(this.hname).getItemInHand())) {
-			this.holder.setItemInHand(plugin.wu.rename(plugin.wu.setLore(this.gunIte, this.lore), display));
+		String display = ChatColor.DARK_GRAY+""+ChatColor.BOLD+this.name + spacer + ammo;
+		//if (i.isSimilar(Bukkit.getPlayer(this.hname).getItemInHand())) {
+		if (i.isSimilar(Bukkit.getPlayer(this.hname).getInventory().getItemInMainHand())) {
+			//this.holder.setItemInHand(plugin.wu.rename(plugin.wu.setLore(this.gunIte, this.lore), display));
+			this.holder.getInventory().setItemInMainHand(plugin.wu.rename(plugin.wu.setLore(this.gunIte, this.lore), display));
 		} else {
 			this.holder.getInventory().setItem(getGunInstance(i), plugin.wu.rename(plugin.wu.setLore(this.gunIte, this.lore), display));
 		}
@@ -764,12 +811,14 @@ public class Gun {
 
 	private ItemStack getItem(String istr) {
 		String[] split = istr.split(",");
-		int id = Integer.parseInt(split[0]);
+		//int id = Integer.parseInt(split[0]);	//F451-07222018
+		String id = split[0];		
 		byte data = 0;
 		if (split.length == 2) {
 			data = Byte.parseByte(split[1]);
 		}
-		return new ItemStack(id, 1, data);
+		Material mat = Material.matchMaterial(id);	//F451-07222018
+		return new ItemStack(mat, 1, data);
 	}
 
 	public ItemStack getGunItem() {
@@ -908,3 +957,4 @@ public class Gun {
 		return this.selfImmunity;
 	}
 }
+

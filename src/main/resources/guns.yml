@@ -1,0 +1,144 @@
+# |\ \--------------ModernWeapons-----------/ /|
+# |/ /                                      \ \|
+# |\ \                  Guns                / /|
+# |/ /                                      \ \|
+# |\ \--------------------------------------/ /|
+# M16A3
+M16A3:
+ General:
+  Item: BLAZE_ROD
+  Ammo: GHAST_TEAR
+  Lore:
+   - '&7A very powerful assault rifle'
+   - '&7Bullet spread decreased when scoping'
+  Sound: AssaultRifle
+ Shooting:
+  Delay: 200
+  Velocity: 9
+  Damage: 7
+  HeadshotBonus: 10
+  Spread: 2
+  Recoil: 3
+  Bullet: SNOWBALL
+ Magazine:
+  Size: 30
+  ReloadTime: 5
+ Scope:
+  Enabled: true
+  Zoom: 5
+  SpreadBonus: -1
+ Bursts:
+  Enabled: true
+  ShotAmount: 2
+  DelayBetween: 3
+# M26 MASS   
+M26 MASS:
+ General:
+  Item: BOWL
+  Ammo: GHAST_TEAR
+  Lore:
+   - '&7Pump action shotgun'
+   - '&7Fires 7 bullets at a time'
+  SelfImmunity: true
+  Sound: Shotgun
+ Shooting:
+  ShotAmount: 7
+  Velocity: 1
+  Damage: 7
+  HeadshotBonus: 7
+  Spread: 3
+  Recoil: 12
+  Range: 20
+  Bullet: SNOWBALL
+ Magazine:
+  Size: 5
+  ReloadTime: 5
+ Scope:
+  Enabled: true
+  Zoom: 2
+ BoltAction:
+  Enabled: true
+  Delay: 1
+ Effects:
+  BulletHit: BlockBreak,21
+# RPG7
+RPG7:
+ General:
+  Item: BLAZE_POWDER
+  Ammo: FIRE_CHARGE
+  Lore:
+   - '&7Rocket Propelled Grenade Launcher!'
+  SelfImmunity: true
+  Sound: RocketLauncher
+ Shooting:
+  Delay: 2500
+  Velocity: 2
+  Damage: 10
+  HeadshotBonus: 10
+  Recoil: 9
+ Magazine:
+  Size: 4
+  ReloadTime: 8
+ Scope:
+  Enabled: true
+  Zoom: 2
+ Explosion:
+  Enabled: true
+  Damage: 8
+  Range: 6
+ Effects:
+  BulletHit: Flames,100
+  BulletShoot: Smoke
+# M98B
+M98B:
+ General:
+  Item: NETHER_WART
+  Ammo: GHAST_TEAR
+  Lore:
+   - '&7One-shot kill sniper rifle'
+   - '&7(in the right hands of course)' 
+  Sound: Sniper
+ Shooting:
+  Velocity: 10
+  Damage: 12
+  HeadshotBonus: 10
+  Recoil: 6
+ Magazine:
+  Size: 9
+  ReloadTime: 7
+ Scope:
+  Enabled: true
+  Zoom: 5
+ BoltAction:
+  Enabled: true
+  Delay: 1
+ Effects:
+  BulletHit: PotionBreak,12
+# KH2002
+KH2002:
+ General:
+  Item: SHEARS
+  Ammo: GHAST_TEAR
+  Lore:
+   - '&7Compact assault rifle'
+   - '&7Fires 3 shot bursts'
+  Sound: AssaultRifle
+ Shooting:
+  Delay: 1000
+  Velocity: 8
+  Damage: 8
+  HeadshotBonus: 12
+  Spread: 2
+  Recoil: 5
+  Bullet: SNOWBALL
+ Bursts:
+  Enabled: true
+  ShotAmount: 3
+  DelayBetween: 2
+ Magazine:
+  Size: 30
+  ReloadTime: 3
+ Scope:
+  Enabled: true
+  Zoom: 4 
+#

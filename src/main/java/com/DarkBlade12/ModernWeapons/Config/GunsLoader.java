@@ -7,12 +7,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
-public class GrenadesLoader {
+public class GunsLoader {
 
 	private YamlConfiguration config;
 	private File configFile;
@@ -24,7 +26,7 @@ public class GrenadesLoader {
 	 * @param main
 	 *            The plugin's main class, for deloading.
 	 */
-	public GrenadesLoader(Plugin main) {
+	public GunsLoader(Plugin main) {
 		plugin = main;
 		load();
 	}
@@ -53,13 +55,13 @@ public class GrenadesLoader {
 	 * Loads the config from disk
 	 */
 	public void load() {
-		this.configFile = new File("plugins/ModernWeapons/grenades.yml");
+		this.configFile = new File("plugins/ModernWeapons/guns.yml");
 		// Create target and copy res-content
 		if (!this.configFile.exists()) {
 			try {
 				new File("plugins/ModernWeapons/").mkdirs();
 				this.configFile.createNewFile();
-				copyResourceYAML(getClass().getResourceAsStream("grenades.yml"), this.configFile);
+				copyResourceYAML(getClass().getResourceAsStream("/guns.yml"), this.configFile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

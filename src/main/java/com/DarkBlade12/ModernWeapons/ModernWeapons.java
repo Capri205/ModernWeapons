@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -16,7 +17,9 @@ import com.DarkBlade12.ModernWeapons.Config.GunsLoader;
 import com.DarkBlade12.ModernWeapons.Listener.WeaponListener;
 import com.DarkBlade12.ModernWeapons.Util.WeaponUtil;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 public class ModernWeapons extends JavaPlugin {
 	Logger log = Logger.getLogger("Minecraft");
@@ -43,7 +46,7 @@ public class ModernWeapons extends JavaPlugin {
 	public String headshotVictim;
 	public String death;
 	public String disabled;
-	public String prefix = "§8§l[§r§3§oModern§4§oWeapons§r§8§l] §r";
+	public String prefix = ChatColor.DARK_GRAY+""+ChatColor.BOLD+"["+ChatColor.RESET+ChatColor.DARK_AQUA+ChatColor.ITALIC+"Modern"+ChatColor.DARK_RED+ChatColor.ITALIC+"Weapons"+ChatColor.RESET+ChatColor.DARK_GRAY+ChatColor.BOLD+"] "+ChatColor.RESET;
 	public List<String> worlds;
 	public boolean knifeEnabled;
 	public int knifeDamage;
@@ -132,12 +135,12 @@ public class ModernWeapons extends JavaPlugin {
 		this.headshotMessage = config.getBoolean("MessageOptions.HeadshotMessage");
 		this.customDeath = config.getBoolean("MessageOptions.CustomDeathMessage");
 		this.disabledMessage = config.getBoolean("MessageOptions.DisabledMessage");
-		this.noMagazine = config.getString("Messages.NoMagazine").replace("&", "§");
-		this.weaponReloaded = config.getString("Messages.WeaponReloaded").replace("&", "§");
-		this.headshotShooter = config.getString("Messages.HeadshotShooter").replace("&", "§");
-		this.headshotVictim = config.getString("Messages.HeadshotVictim").replace("&", "§");
-		this.death = config.getString("Messages.Death").replace("&", "§");
-		this.disabled = config.getString("Messages.Disabled").replace("&", "§");
+		this.noMagazine = config.getString("Messages.NoMagazine");
+		this.weaponReloaded = config.getString("Messages.WeaponReloaded");
+		this.headshotShooter = config.getString("Messages.HeadshotShooter");
+		this.headshotVictim = config.getString("Messages.HeadshotVictim");
+		this.death = config.getString("Messages.Death");
+		this.disabled = config.getString("Messages.Disabled");
 		// General stuff
 		this.fullmagStart = config.getBoolean("General.FullMagazineStart");
 		this.worldLimit = config.getBoolean("General.WorldLimit.Enabled");
@@ -148,9 +151,6 @@ public class ModernWeapons extends JavaPlugin {
 		this.headshotEffect = config.getBoolean("General.HeadshotEffect");
 		this.worlds = config.getStringList("General.WorldLimit.Worlds");
 		this.hasWorldGuard = worldGuardInstalled();
-		if (this.hasWorldGuard) {
-			log.log(Level.INFO, "[ModernWeapons] WorldGuard and WorldEdit have been detected!");
-		}
 		// Knife
 		this.knifeEnabled = config.getBoolean("Knife.Enabled");
 		this.knifeDamage = config.getInt("Knife.Damage");
@@ -174,6 +174,17 @@ public class ModernWeapons extends JavaPlugin {
 			return null;
 		}
 		return (WorldGuardPlugin) plugin;
+	}
+	
+	/**
+	 * Gets WorldGuard region container
+	 */
+	public RegionContainer getRegionContainer() {
+		Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
+		if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+			return null;
+		}
+		return WorldGuard.getInstance().getPlatform().getRegionContainer();
 	}
 
 	/**
@@ -209,3 +220,4 @@ public class ModernWeapons extends JavaPlugin {
 		this.getCommand("mw").setExecutor(mwCE);
 	}
 }
+

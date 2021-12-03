@@ -1,0 +1,43 @@
+# |\ \--------------ModernWeapons-----------/ /|
+# |/ /                                      \ \|
+# |\ \                Grenades              / /|
+# |/ /                                      \ \|
+# |\ \--------------------------------------/ /|
+# High explosive grenade
+M-67:
+ General:
+  Item: RABBIT_FOOT
+  Lore:
+   - '&cA common high explosive grenade'
+  Cooldown: 2000
+ Explosion:
+  Delay: 3
+  Damage: 12
+  Range: 7
+  Smoke: true
+# Sticky bomb
+Semtex:
+ General:
+  Item: RABBIT_HIDE
+  Lore:
+   - '&aA grenade that sticks to enemies'
+  Cooldown: 2000
+ Explosion:
+  Delay: 2
+  Damage: 18
+  Range: 3
+ Ability:
+  Sticky: true
+# Flash grenade
+Flashbang:
+ General:
+  Item: POISONOUS_POTATO
+  Lore:
+   - '&8Blind your enemies'
+  Cooldown: 1000
+ Explosion:
+  Delay: 0
+  Range: 5
+ Ability:
+  Effects:
+   - Blindness,20

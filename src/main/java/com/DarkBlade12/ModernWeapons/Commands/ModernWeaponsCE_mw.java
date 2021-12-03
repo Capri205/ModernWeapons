@@ -1,5 +1,8 @@
 package com.DarkBlade12.ModernWeapons.Commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -7,6 +10,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.MaterialData;
 
 import com.DarkBlade12.ModernWeapons.ModernWeapons;
 import com.DarkBlade12.ModernWeapons.Weapons.Grenade;
@@ -38,13 +43,13 @@ public class ModernWeaponsCE_mw implements CommandExecutor {
 				plugin.reloadConfig();
 				plugin.initializeStuff();
 				if (sender instanceof Player) {
-					sender.sendMessage("§6§o[ModernWeapons] Config has been reloaded.");
+					sender.sendMessage(ChatColor.GOLD+""+ChatColor.ITALIC+"[ModernWeapons] Config has been reloaded.");
 					return true;
 				} else {
-					sender.sendMessage("CONSOLE: §6ModernWeapons config reloaded.");
+					sender.sendMessage("CONSOLE: "+ChatColor.GOLD+"ModernWeapons config reloaded.");
 					for (Player p : Bukkit.getOnlinePlayers()) {
 						if (p.hasPermission("McWeapons.reload")) {
-							p.sendMessage("§7§o[CONSOLE: §6§oModernWeapons config has been reloaded.§7§o]");
+							p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"[CONSOLE: "+ChatColor.GOLD+ChatColor.ITALIC+"ModernWeapons config has been reloaded."+ChatColor.GRAY+ChatColor.ITALIC+"]");
 						}
 					}
 					return true;
@@ -58,7 +63,7 @@ public class ModernWeaponsCE_mw implements CommandExecutor {
 					sender.sendMessage(ChatColor.RED + "You don't have permission for this command!");
 					return true;
 				}
-				sender.sendMessage(plugin.prefix + "§9List of weapons: \n §4\u2022 §c§lGuns:§r" + plugin.wu.getGunList() + "\n §4\u2022 §6§lGrenades:§r" + plugin.wu.getGrenadeList());
+				sender.sendMessage(plugin.prefix + ChatColor.BLUE +"List of weapons: \n "+ChatColor.DARK_RED+"\u2022 "+ChatColor.RED+ChatColor.ITALIC+"Guns:"+ChatColor.RESET + plugin.wu.getGunList() + "\n "+ChatColor.DARK_RED+"\u2022 "+ChatColor.GOLD+ChatColor.ITALIC+"Grenades:"+ChatColor.RESET + plugin.wu.getGrenadeList());
 				return true;
 			} else if (args[0].equalsIgnoreCase("info")) {
 				if (args.length != 2) {
@@ -71,10 +76,10 @@ public class ModernWeaponsCE_mw implements CommandExecutor {
 				}
 				String weapon = plugin.wu.getWeaponByName(args[1]);
 				if (weapon == null) {
-					sender.sendMessage(plugin.prefix + "§cThat weapon doesn't exist!");
+					sender.sendMessage(plugin.prefix + ChatColor.RED + "That weapon doesn't exist!");
 					return true;
 				}
-				sender.sendMessage(plugin.prefix + "§9Detailed information about §b" + weapon + "§9:" + plugin.wu.getWeaponInformations(weapon));
+				sender.sendMessage(plugin.prefix + ChatColor.BLUE + "Detailed information about " + ChatColor.AQUA + weapon + ChatColor.BLUE + ":" + plugin.wu.getWeaponInformations(weapon));
 				return true;
 			} else if (args[0].equalsIgnoreCase("give")) {
 				if (!(sender instanceof Player)) {
@@ -102,18 +107,18 @@ public class ModernWeaponsCE_mw implements CommandExecutor {
 				if (weapon == null) {
 					if (wstr.equalsIgnoreCase("Knife")) {
 						if (!plugin.wu.hasEnoughSpace(p)) {
-							p.sendMessage(plugin.prefix + "§cYou don't have enough space!");
+							p.sendMessage(plugin.prefix + ChatColor.RED + "You don't have enough space!");
 							return true;
 						}
-						p.getInventory().addItem(plugin.wu.rename(plugin.knifeIte, "§b§oKnife"));
-						p.sendMessage(plugin.prefix + "§eHere's your knife!");
+						p.getInventory().addItem(plugin.wu.rename(plugin.knifeIte, ChatColor.AQUA+""+ChatColor.ITALIC+"Knife"));
+						p.sendMessage(plugin.prefix + ChatColor.YELLOW + "Here's your knife!");
 						return true;
 					}
-					p.sendMessage(plugin.prefix + "§cThat weapon doesn't exist!");
+					p.sendMessage(plugin.prefix + ChatColor.RED + "That weapon doesn't exist!");
 					return true;
 				}
 				if (!plugin.wu.hasEnoughSpace(p)) {
-					p.sendMessage(plugin.prefix + "§cYou don't have enough space!");
+					p.sendMessage(plugin.prefix + ChatColor.RED + "You don't have enough space!");
 					return true;
 				}
 				if (plugin.wu.isGun(weapon)) {
@@ -125,7 +130,7 @@ public class ModernWeaponsCE_mw implements CommandExecutor {
 					p.getInventory().addItem(gr.getGrenadeItem());
 					gr.refreshItem();
 				}
-				p.sendMessage(plugin.prefix + "§eHere's your weapon supply!");
+				p.sendMessage(plugin.prefix + ChatColor.YELLOW + "Here's your weapon supply!");
 				return true;
 			} else if (args[0].equalsIgnoreCase("ammo")) {
 				if (!(sender instanceof Player)) {
@@ -151,22 +156,28 @@ public class ModernWeaponsCE_mw implements CommandExecutor {
 				}
 				String weapon = plugin.wu.getWeaponByName(wstr);
 				if (weapon == null) {
-					p.sendMessage(plugin.prefix + "§cThat weapon doesn't exist!");
+					p.sendMessage(plugin.prefix + ChatColor.RED + "That weapon doesn't exist!");
 					return true;
 				}
 				if (!plugin.wu.isGun(weapon)) {
-					p.sendMessage(plugin.prefix + "§cGrenades don't have ammo!");
+					p.sendMessage(plugin.prefix + ChatColor.RED + "Grenades don't have ammo!");
 					return true;
 				}
 				if (!plugin.wu.hasEnoughSpace(p)) {
-					p.sendMessage(plugin.prefix + "§cYou don't have enough space!");
+					p.sendMessage(plugin.prefix + ChatColor.RED + "You don't have enough space!");
 					return true;
 				}
 				Gun g = new Gun(weapon, p, plugin, null);
 				ItemStack ammo = g.getAmmoItem();
 				ammo.setAmount(64);
+				List<String> lore = new ArrayList<String>();
+				lore.add("Ammo for "+g.getName());
+				ItemMeta im = ammo.getItemMeta();
+					im.setDisplayName("Ammo");
+					im.setLore(lore);
+				ammo.setItemMeta(im);
 				p.getInventory().addItem(ammo);
-				p.sendMessage(plugin.prefix + "§eHere's your ammo supply!");
+				p.sendMessage(plugin.prefix + ChatColor.YELLOW + "Here's your ammo supply!");
 				return true;
 			}
 		}

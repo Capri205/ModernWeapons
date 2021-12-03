@@ -12,7 +12,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
-public class GunsLoader {
+public class GrenadesLoader {
 
 	private YamlConfiguration config;
 	private File configFile;
@@ -24,7 +24,7 @@ public class GunsLoader {
 	 * @param main
 	 *            The plugin's main class, for deloading.
 	 */
-	public GunsLoader(Plugin main) {
+	public GrenadesLoader(Plugin main) {
 		plugin = main;
 		load();
 	}
@@ -53,13 +53,13 @@ public class GunsLoader {
 	 * Loads the config from disk
 	 */
 	public void load() {
-		this.configFile = new File("plugins/ModernWeapons/guns.yml");
+		this.configFile = new File("plugins/ModernWeapons/grenades.yml");
 		// Create target and copy res-content
 		if (!this.configFile.exists()) {
 			try {
 				new File("plugins/ModernWeapons/").mkdirs();
 				this.configFile.createNewFile();
-				copyResourceYAML(getClass().getResourceAsStream("guns.yml"), this.configFile);
+				copyResourceYAML(getClass().getResourceAsStream("/grenades.yml"), this.configFile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -112,3 +112,4 @@ public class GunsLoader {
 		}
 	}
 }
+
