@@ -27,4 +27,5 @@ Tutorial
 Take a look at [this](https://dev.bukkit.org/projects/modernweapons/pages/config) page for detailed informations about creating own weapons!
 
 Original project by DarkBlade12
+
 Continued updates by Fahrenheit451 (Capri205)
