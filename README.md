@@ -2,7 +2,10 @@
 
 ![Alt text](https://ob-mc.net/repo/ModernWeapons.png "ModernWeapons")
 
-Source code of ModernWeapons bukkit plugin.
+Source code of ModernWeapons bukkit plugin.\
+Updated to Java 17 and spigot API 1.18\
+(I've been updating it since 1.8, but only just forked the original and updated)\
+The original bukkit page is [here](https://dev.bukkit.org/projects/modernweapons)
 
 ModernWeapons - The weapon revolution!
 ModernWeapons adds weapons to your server such as guns, rocket launchers and grenades. You can fully customize the properties of each weapon in the config.yml! There are also permissions for each weapon, without that a player can't use a weapon. It's great fun to use and play around with it!
@@ -23,9 +26,10 @@ Features
 * Different config files for grenades and guns which don't have to be reloaded
 * You can stab other players with the knife from behind
 
-Tutorial
+Tutorial\
 Take a look at [this](https://dev.bukkit.org/projects/modernweapons/pages/config) page for detailed informations about creating own weapons!
 
 Original project by DarkBlade12
 
-Continued updates by Fahrenheit451 (Capri205)
+Texture Pack\
+I created a texture pack and will upload once I locate it.
