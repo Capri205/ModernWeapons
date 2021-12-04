@@ -26,10 +26,10 @@ Features
 * Different config files for grenades and guns which don't have to be reloaded
 * You can stab other players with the knife from behind
 
-Tutorial\
+#Tutorial
 Take a look at [this](https://dev.bukkit.org/projects/modernweapons/pages/config) page for detailed informations about creating own weapons!
 
-Original project by DarkBlade12
+Original project by DarkBlade12. Kudos to him for creating a great little plugin for our Wild Wild West server whilst it was operational!
 
-Texture Pack\
-I created a texture pack and will upload once I locate it.
+#Texture Pack
+I created a server side texture pack that can be found [here](https://ob-mc.net/repo/ModernWeaponsTP.zip).
