@@ -3,7 +3,7 @@
 ![Alt text](https://ob-mc.net/repo/ModernWeapons.png "ModernWeapons")
 
 Source code of ModernWeapons bukkit plugin.<br>
-Updated to Java 17 and spigot API 1.19<br>
+Updated to Java 17 and spigot API 1.20<br>
 (I've been updating it since 1.8, but only just forked the original on github and updated)<br>
 The original Bukkit page is [here](https://dev.bukkit.org/projects/modernweapons)<br>
 

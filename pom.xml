@@ -31,11 +31,11 @@
   <repositories>
     <repository>
       <id>spigot-repo</id>
-      <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/public</url>
     </repository>
     <repository>
       <id>sk89q-repo</id>
-      <url>https://maven.sk89q.com/repo/</url>
+      <url>https://maven.enginehub.org/repo</url>
     </repository>
   </repositories>
 
@@ -43,17 +43,17 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.19-R0.1-SNAPSHOT</version>
+      <version>1.20-R0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.sk89q.worldedit</groupId>
       <artifactId>worldedit-bukkit</artifactId>
-      <version>7.1.0</version>
+      <version>7.2.14</version>
     </dependency>
     <dependency>
       <groupId>com.sk89q.worldguard</groupId>
       <artifactId>worldguard-bukkit</artifactId>
-      <version>7.0.3</version>
+      <version>7.0.8</version>
     </dependency>    
   
   </dependencies>
