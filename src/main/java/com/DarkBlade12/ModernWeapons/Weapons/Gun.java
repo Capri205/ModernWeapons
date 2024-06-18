@@ -172,7 +172,6 @@ public class Gun {
 			return;
 		}
 		String display = i.getItemMeta().getDisplayName();
-		String[] parts = display.split(" \u25AA | \u25AB ");
 		if (display.split("\\(").length == 1) {
 			if (plugin.fullmagStart) {
 				this.shotsLeft = this.magSize;
@@ -379,7 +378,7 @@ public class Gun {
 		switch (this.hitEffect) {
 			case BLOCK_BREAK:
 				//w.playEffect(loc, Effect.STEP_SOUND, this.hitEffectData);
-				w.spawnParticle(Particle.BLOCK_DUST, loc, this.hitEffectData, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
+				w.spawnParticle(Particle.DUST, loc, this.hitEffectData, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
 				return;
 			case ENDER_SIGNAL:
 //				w.playEffect(loc, Effect.ENDER_SIGNAL, this.hitEffectData);
@@ -391,11 +390,11 @@ public class Gun {
 				return;
 			case POTION_BREAK:
 //				w.playEffect(loc, Effect.POTION_BREAK, this.hitEffectData);
-				w.spawnParticle(Particle.SPELL, loc, this.hitEffectData, 0, 0, 0, 0.2);
+				w.spawnParticle(Particle.EFFECT, loc, this.hitEffectData, 0, 0, 0, 0.2);
 				return;
 			case SMOKE:
 //				w.playEffect(loc, Effect.SMOKE, this.hitEffectData);
-				w.spawnParticle(Particle.SMOKE_NORMAL, loc, this.hitEffectData, 0, 0, 0, 1);
+				w.spawnParticle(Particle.SMOKE, loc, this.hitEffectData, 0, 0, 0, 1);
 				return;
 		}
 	}
@@ -409,7 +408,7 @@ public class Gun {
 		switch (this.shootEffect) {
 			case BLOCK_BREAK:
 				//w.playEffect(loc, Effect.STEP_SOUND, this.shootEffectData);
-				w.spawnParticle(Particle.BLOCK_DUST, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
+				w.spawnParticle(Particle.DUST, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
 				return;
 			case ENDER_SIGNAL:
 				//w.playEffect(loc, Effect.ENDER_SIGNAL, this.shootEffectData);
@@ -421,11 +420,11 @@ public class Gun {
 				return;
 			case POTION_BREAK:
 				//w.playEffect(loc, Effect.POTION_BREAK, this.shootEffectData);
-				w.spawnParticle(Particle.SPELL, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, 0.2);
+				w.spawnParticle(Particle.EFFECT, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, 0.2);
 				return;
 			case SMOKE:
 				//w.playEffect(loc, Effect.SMOKE, this.shootEffectData);
-				w.spawnParticle(Particle.SMOKE_NORMAL, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, 0.1);
+				w.spawnParticle(Particle.SMOKE, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, 0.1);
 				return;
 		}
 	}

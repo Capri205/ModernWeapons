@@ -122,12 +122,12 @@ public class WeaponUtil {
 		EntityType et = e.getType();
 		// F451-04032020 - removed COMPLEX_PART and WEATHER
 		if (et == EntityType.ITEM_FRAME || et == EntityType.BOAT || et == EntityType.ARROW || 
-				et == EntityType.ENDER_CRYSTAL || et == EntityType.EGG || et == EntityType.DROPPED_ITEM || 
-				et == EntityType.ENDER_PEARL || et == EntityType.ENDER_SIGNAL || et == EntityType.EXPERIENCE_ORB || 
-				et == EntityType.FALLING_BLOCK || et == EntityType.FIREBALL || et == EntityType.LIGHTNING || 
-				et == EntityType.MINECART || et == EntityType.PAINTING || et == EntityType.PRIMED_TNT || 
-				et == EntityType.SMALL_FIREBALL || et == EntityType.SNOWBALL || et == EntityType.SPLASH_POTION || 
-				et == EntityType.THROWN_EXP_BOTTLE || et == EntityType.UNKNOWN || et == EntityType.WITHER_SKULL) {
+				et == EntityType.END_CRYSTAL || et == EntityType.EGG || et == EntityType.ITEM || 
+				et == EntityType.ENDER_PEARL || et == EntityType.EYE_OF_ENDER || et == EntityType.EXPERIENCE_ORB || 
+				et == EntityType.FALLING_BLOCK || et == EntityType.FIREBALL || et == EntityType.LIGHTNING_BOLT || 
+				et == EntityType.MINECART || et == EntityType.PAINTING || et == EntityType.TNT || 
+				et == EntityType.SMALL_FIREBALL || et == EntityType.SNOWBALL || et == EntityType.POTION || 
+				et == EntityType.EXPERIENCE_BOTTLE || et == EntityType.UNKNOWN || et == EntityType.WITHER_SKULL) {
 			return false;
 		}
 		return true;

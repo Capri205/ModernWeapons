@@ -260,7 +260,7 @@ public class WeaponListener implements Listener {
 			}
 			if (plugin.headshotEffect) {
 				//e.getWorld().playEffect(e.getEyeLocation(), Effect.STEP_SOUND, 55);
-				e.getWorld().spawnParticle(Particle.BLOCK_DUST, e.getEyeLocation(), 55, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
+				e.getWorld().spawnParticle(Particle.DUST, e.getEyeLocation(), 55, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
 			}
 			damage += g.getHeadshotBonus();
 		} else {
