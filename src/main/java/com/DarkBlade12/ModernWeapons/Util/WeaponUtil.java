@@ -7,7 +7,9 @@ import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -20,6 +22,7 @@ import com.DarkBlade12.ModernWeapons.ModernWeapons;
 
 
 public class WeaponUtil {
+
 	ModernWeapons plugin;
 
 	Logger log = Logger.getLogger("Minecraft");
@@ -42,7 +45,7 @@ public class WeaponUtil {
 
 		//int id = i.getTypeId();	//F451-07212018
 		String id = i.getType().name();
-		byte data = i.getData().getData();
+		//byte data = i.getData().getData();
 		// Check for guns
 		Configuration guns = plugin.getGuns();
 		for (String gname : guns.getKeys(false)) {
@@ -119,9 +122,13 @@ public class WeaponUtil {
 	}
 
 	public boolean isValidEntity(Entity e) {
+
+		if ( e instanceof Boat ) {
+			return false;
+		}
+		
 		EntityType et = e.getType();
-		// F451-04032020 - removed COMPLEX_PART and WEATHER
-		if (et == EntityType.ITEM_FRAME || et == EntityType.BOAT || et == EntityType.ARROW || 
+		if (et == EntityType.ITEM_FRAME || et == EntityType.GLOW_ITEM_FRAME || et == EntityType.ARROW || 
 				et == EntityType.END_CRYSTAL || et == EntityType.EGG || et == EntityType.ITEM || 
 				et == EntityType.ENDER_PEARL || et == EntityType.EYE_OF_ENDER || et == EntityType.EXPERIENCE_ORB || 
 				et == EntityType.FALLING_BLOCK || et == EntityType.FIREBALL || et == EntityType.LIGHTNING_BOLT || 

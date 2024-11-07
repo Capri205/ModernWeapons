@@ -263,7 +263,8 @@ public class Grenade {
 			ItemStack is = this.holder.getInventory().getItem(i);
 			if (is != null) {
 				//if (is.getTypeId() == this.grenIte.getTypeId() && is.getData().getData() == this.grenIte.getData().getData()) {	//F451-07222018
-				if (is.getType().name() == this.grenIte.getType().name() && is.getData().getData() == this.grenIte.getData().getData()) {
+				//if (is.getType().name() == this.grenIte.getType().name() && is.getData().getData() == this.grenIte.getData().getData()) {
+				if (is.getType().name() == this.grenIte.getType().name()) {
 					slots.add(i);
 				}
 			}

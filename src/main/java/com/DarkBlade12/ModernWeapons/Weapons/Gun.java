@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -84,6 +85,8 @@ public class Gun {
 	private ItemStack source;
 	private ModernWeapons plugin;
 	private Configuration config;
+
+	private Particle.DustOptions gunDust = new Particle.DustOptions( Color.GRAY, 0.2f );
 
 	public Gun(String name, Player holder, ModernWeapons ModernWeapons, ItemStack i) {
 		this.name = name;
@@ -378,7 +381,7 @@ public class Gun {
 		switch (this.hitEffect) {
 			case BLOCK_BREAK:
 				//w.playEffect(loc, Effect.STEP_SOUND, this.hitEffectData);
-				w.spawnParticle(Particle.DUST, loc, this.hitEffectData, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
+				w.spawnParticle(Particle.DUST, loc, this.hitEffectData, 0, 0, 0, gunDust);
 				return;
 			case ENDER_SIGNAL:
 //				w.playEffect(loc, Effect.ENDER_SIGNAL, this.hitEffectData);
@@ -408,7 +411,7 @@ public class Gun {
 		switch (this.shootEffect) {
 			case BLOCK_BREAK:
 				//w.playEffect(loc, Effect.STEP_SOUND, this.shootEffectData);
-				w.spawnParticle(Particle.DUST, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
+				w.spawnParticle(Particle.DUST, loc.add(1.0,-1.0,-2.0), this.hitEffectData, 0, 0, 0, gunDust);
 				return;
 			case ENDER_SIGNAL:
 				//w.playEffect(loc, Effect.ENDER_SIGNAL, this.shootEffectData);
@@ -656,9 +659,10 @@ public class Gun {
 			if (i != null) {
 				//int id = i.getTypeId();	//F451-07220218
 				String id = i.getType().name();
-				byte data = i.getData().getData();
+				//byte data = i.getData().getData();
 				//if (id == this.ammoIte.getTypeId() && data == this.ammoIte.getData().getData()) {	//F451-07222018
-				if (id == this.ammoIte.getType().name() && data == this.ammoIte.getData().getData()) {
+				//if (id == this.ammoIte.getType().name() && data == this.ammoIte.getData().getData()) {
+				if (id == this.ammoIte.getType().name()) {
 					if (remaining > 0) {
 						if (i.getAmount() == amount) {
 							//i.setTypeId(0);	//F451-07222018
@@ -703,10 +707,11 @@ public class Gun {
 			if (stack != null) {
 				//int id = stack.getTypeId();	//F451-07222018
 				String id = stack.getType().name();
-				byte data = stack.getData().getData();
+				//byte data = stack.getData().getData();
 				int amount = stack.getAmount();
 				//if (id == this.ammoIte.getTypeId() && data == this.ammoIte.getData().getData()) {	//F451-07222018
-				if (id == this.ammoIte.getType().name() && data == this.ammoIte.getData().getData()) {
+				//if (id == this.ammoIte.getType().name() && data == this.ammoIte.getData().getData()) {
+				if (id == this.ammoIte.getType().name()) {
 					cmag = cmag + amount;
 				}
 			}

@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,8 +46,12 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 public class WeaponListener implements Listener {
+	
 	ModernWeapons plugin;
+
 	Logger log = Logger.getLogger("Minecraft");
+
+	private Particle.DustOptions gunDust = new Particle.DustOptions( Color.GRAY, 0.2f );
 
 	public WeaponListener(ModernWeapons ModernWeapons) {
 		this.plugin = ModernWeapons;
@@ -260,7 +265,9 @@ public class WeaponListener implements Listener {
 			}
 			if (plugin.headshotEffect) {
 				//e.getWorld().playEffect(e.getEyeLocation(), Effect.STEP_SOUND, 55);
-				e.getWorld().spawnParticle(Particle.DUST, e.getEyeLocation(), 55, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
+				//e.getWorld().spawnParticle(Particle.DUST, e.getEyeLocation(), 55, 0, 0, 0, Material.DEAD_BRAIN_CORAL_BLOCK.createBlockData());
+				e.getWorld().spawnParticle(Particle.DUST, e.getEyeLocation(), 25, 0, 0, 0, gunDust);
+
 			}
 			damage += g.getHeadshotBonus();
 		} else {
